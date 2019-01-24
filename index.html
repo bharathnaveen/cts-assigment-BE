@@ -1,9 +1,7 @@
 <html>
-
 <head>
   <title>File upload Node.</title>
 </head>
-
 <body>
   <form id="uploadForm" enctype="multipart/form-data" action="/upload" method="post">
     <input type="file" id="uploadedFile" name="uploadedFile" />
@@ -26,6 +24,7 @@
         },
 
         success: function (response) {
+          console.log(response)
           var table = document.createElement("table");
           var tableBody = document.createElement("tbody");
 
@@ -70,6 +69,8 @@
     $('#uploadedFile').change(function () {
       $('table tbody').empty();
     })
+
+
   });
 </script>
 <style>

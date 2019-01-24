@@ -14,6 +14,7 @@ app.get("/", function (req, res) {
 
 app.post("/upload", function (req, res) {
   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+
   let records = [];
   let errorRecords = [];
   if (req.files.uploadedFile.name.indexOf('.xml') != -1) {
