@@ -1,45 +1,45 @@
-var express = require("express");
-var convert = require("xml-js");
-var fileUpload = require("express-fileupload");
+const express = require("express");
+const convert = require("xml-js");
+const fileUpload = require("express-fileupload");
 
-var app = express();
+const app = express();
 
 //middleware
 app.use(express.static(__dirname));
 app.use(fileUpload());
 
-app.get("/", function (req, res) {
+app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
-app.post("/upload", function (req, res) {
-  // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-
+/*
+- POST API method which validate both XML and CSV format,
+- It will validate all transaction reference no should be unique,
+- and end balance should be validated based on start balance + mutation values.
+*/
+app.post("/upload", (req, res) => {
   let records = [];
   let errorRecords = [];
-  if (req.files.uploadedFile.name.indexOf('.xml') != -1) {
+  if (req.files.uploadedFile.name.indexOf('.xml') != -1) { // XML File Validations
     let data = req.files.uploadedFile.data.toString();
     records = (JSON.parse(convert.xml2json(data, { compact: true, spaces: 4 }))).records.record;
     for (const record of records) {
       let isUnique = true;
       let isEndBalanceCorrect = true;
-      //unique validation
-      if (record._attributes.reference && records.filter(r => r._attributes.reference == record._attributes.reference).length > 1) {
+      //Transaction Reference Unique Validation
+      if (record._attributes.reference && records.filter(value => value._attributes.reference == record._attributes.reference).length > 1) {
         isUnique = false;
-
       }
-      //end balance validation
+      //End Balance Validation
       if ((parseFloat(record.startBalance._text) + parseFloat(record.mutation._text)).toFixed(2) != parseFloat(record.endBalance._text).toFixed(2)) {
         isEndBalanceCorrect = false;
       }
-
       if (!isUnique || !isEndBalanceCorrect) {
-        let error = !isUnique && !isEndBalanceCorrect ? "duplicate reference no,incorrect end balance" : !isUnique && isEndBalanceCorrect ? "duplicate reference no" : "incorrect end balance";
+        let error = !isUnique && !isEndBalanceCorrect ? "Duplicate Reference No, Incorrect End Balance" : !isUnique && isEndBalanceCorrect ? "Duplicate Reference No" : "Incorrect End Balance";
         errorRecords.push({ Reference: record._attributes.reference, Description: record.description._text, error });
       }
     }
-
-  } else if (req.files.uploadedFile.name.indexOf('.csv')) {
+  } else if (req.files.uploadedFile.name.indexOf('.csv')) { // CSV File Validations
     let rows = req.files.uploadedFile.data.toString("utf8").trim().split("\n");
     let headers = [];
     for (let i = 0; i < rows.length; i++) {
@@ -60,22 +60,20 @@ app.post("/upload", function (req, res) {
         }
         records.push(record);
       }
-
     }
     for (const record of records) {
       let isUnique = true;
       let isEndBalanceCorrect = true;
-      //unique validation
-      if (record.Reference && records.filter(r => r.Reference == record.Reference).length > 1) {
+      //Transaction Reference Unique Validation
+      if (record.Reference && records.filter(value => value.Reference == record.Reference).length > 1) {
         isUnique = false;
       }
-      //end balance validation
+      //End Balance Validation
       if ((parseFloat(record.Start_Balance) + parseFloat(record.Mutation)).toFixed(2) != parseFloat(record.End_Balance).toFixed(2)) {
         isEndBalanceCorrect = false;
       }
-
       if (!isUnique || !isEndBalanceCorrect) {
-        let error = !isUnique && !isEndBalanceCorrect ? "duplicate reference no,incorrect end balance" : !isUnique && isEndBalanceCorrect ? "duplicate reference no" : "incorrect end balance";
+        let error = !isUnique && !isEndBalanceCorrect ? "Duplicate Reference No, Incorrect End Balance" : !isUnique && isEndBalanceCorrect ? "Duplicate Reference No" : "Incorrect End Balance";
         errorRecords.push({ Reference: record.Reference, Description: record.Description, error });
       }
     }

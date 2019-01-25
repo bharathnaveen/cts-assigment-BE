@@ -1,88 +1,78 @@
 <html>
-<head>
-  <title>File upload Node.</title>
-</head>
-<body>
-  <form id="uploadForm" enctype="multipart/form-data" action="/upload" method="post">
-    <input type="file" id="uploadedFile" name="uploadedFile" />
-    <input type="submit" value="Upload Image" name="submit">
-    <span id="status"></span>
-  </form>
-</body>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
-<script>
-  $(document).ready(function () {
+   <head>
+      <title>File upload Node.</title>
+   </head>
+   <body>
+      <h3>Upload only .xml and .csv file format</h3>
+      <form id="uploadForm" enctype="multipart/form-data" action="/upload" method="post">
+         <input type="file" id="uploadedFile" name="uploadedFile" />
+         <input type="submit" value="Upload File" name="submit"> 
+         <span id="status"></span>
+      </form>
+   </body>
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+   <script>
+     // Once file uploaded and clicking on 'Upload File' button this function will execute tha api call to node server.
+      $(document).ready(function () {
+      
+        $('#uploadForm').submit(function () {
+          $("#status").empty().text("File is uploading...");
+      
+          $(this).ajaxSubmit({
+            // Error handler
+            error: function (xhr) {
+              status('Error: ' + xhr.status);
+            },
+            // Success method which display the response in a page 
+            success: function (response) {
+              let table = document.createElement("table");
+              let tableBody = document.createElement("tbody");
+              let headerRow = document.createElement("tr");
+      
+              let ReferenceHeader = document.createElement("th");
+              ReferenceHeader.appendChild(document.createTextNode("Reference"));
+              headerRow.appendChild(ReferenceHeader);
+      
+              let DescHeader = document.createElement("th");
+              DescHeader.appendChild(document.createTextNode("Description"));
+              headerRow.appendChild(DescHeader);
+      
+              let ErrorHeader = document.createElement("th");
+              ErrorHeader.appendChild(document.createTextNode("Error"));
+              headerRow.appendChild(ErrorHeader);
 
-    $('#uploadForm').submit(function () {
-      $("#status").empty().text("File is uploading...");
-
-      $(this).ajaxSubmit({
-
-        error: function (xhr) {
-          status('Error: ' + xhr.status);
-        },
-
-        success: function (response) {
-          console.log(response)
-          var table = document.createElement("table");
-          var tableBody = document.createElement("tbody");
-
-          let headerRow = document.createElement("tr");
-
-          let ReferenceHeader = document.createElement("th");
-          ReferenceHeader.appendChild(document.createTextNode("Reference"));
-          headerRow.appendChild(ReferenceHeader);
-
-          let DescHeader = document.createElement("th");
-          DescHeader.appendChild(document.createTextNode("Description"));
-          headerRow.appendChild(DescHeader);
-
-          let ErrorHeader = document.createElement("th");
-          ErrorHeader.appendChild(document.createTextNode("Error"));
-          headerRow.appendChild(ErrorHeader);
-
-          tableBody.appendChild(headerRow);
-
-          for (let i = 0; i < response.length; i++) {
-            let row = document.createElement("tr");
-            for (const key in response[i]) {
-              let Reference = document.createElement("td");
-              let ReferenceText = document.createTextNode(response[i][key]);
-              Reference.appendChild(ReferenceText);
-              row.appendChild(Reference);
+              tableBody.appendChild(headerRow);
+              for (let i = 0; i < response.length; i++) {
+                let row = document.createElement("tr");
+                for (const key in response[i]) {
+                  let Reference = document.createElement("td");
+                  let ReferenceText = document.createTextNode(response[i][key]);
+                  Reference.appendChild(ReferenceText);
+                  row.appendChild(Reference);
+                }
+                tableBody.appendChild(row);
+              }
+              table.appendChild(tableBody);
+              document.body.appendChild(table);
+              $("#status").empty().text(response);
             }
-            tableBody.appendChild(row);
-          }
-
-          table.appendChild(tableBody);
-
-          document.body.appendChild(table);
-
-          $("#status").empty().text(response);
-        }
+          });
+          return false;
+        });
+        $('#uploadedFile').change(function () {
+          $('table tbody').empty();
+        })
       });
-
-      return false;
-    });
-
-    $('#uploadedFile').change(function () {
-      $('table tbody').empty();
-    })
-
-
-  });
-</script>
-<style>
-  table,
-  th,
-  td {
-    border: 1px solid black;
-  }
-
-  table {
-    border-collapse: collapse;
-  }
-</style>
-
+   </script>
+   <style>
+      table,
+      th,
+      td {
+      border: 1px solid black;
+      }
+      table {
+      border-collapse: collapse;
+      }
+   </style>
 </html>
