@@ -1,6 +1,6 @@
 File-upload
 ===================
-File upload which supports only .xml and .csv file format, which used to validate transaction reference number and end balance value.
+File upload which supports only .xml and .csv file format, which used to validate transaction reference number and end balance value and it will only failed records in UI.
 
 Getting Started
 ===================
