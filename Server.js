@@ -15,7 +15,7 @@ app.get("/", (req, res) => {
 /*
 - POST API method which validate both XML and CSV format,
 - It will validate all transaction reference no should be unique,
-- and end balance should be validated based on start balance + mutation values.
+- and end balance should be validated based on start balance & mutation values.
 */
 app.post("/upload", (req, res) => {
   let records = [];
@@ -26,7 +26,7 @@ app.post("/upload", (req, res) => {
     for (const record of records) {
       let isUnique = true;
       let isEndBalanceCorrect = true;
-      //Transaction Reference Unique Validation
+      //Transaction Reference Number Unique Validation
       if (record._attributes.reference && records.filter(value => value._attributes.reference == record._attributes.reference).length > 1) {
         isUnique = false;
       }
@@ -64,7 +64,7 @@ app.post("/upload", (req, res) => {
     for (const record of records) {
       let isUnique = true;
       let isEndBalanceCorrect = true;
-      //Transaction Reference Unique Validation
+      //Transaction Reference Number Unique Validation
       if (record.Reference && records.filter(value => value.Reference == record.Reference).length > 1) {
         isUnique = false;
       }
